@@ -1,0 +1,1 @@
+Note: To access the mysql database, you have to have it installed on your machine. For the program to access it, you need to create a .env file with 'DB_PASSWORD=your_password' in it
