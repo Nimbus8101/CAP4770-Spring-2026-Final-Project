@@ -2,6 +2,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
+from sklearn.svm import SVC, LinearSVC
 from feature_engineering import FeatureEngineer
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -51,6 +52,49 @@ def build_rf_pipeline(model=None, numeric_cols=None, categorical_cols=None):
     ])
     
     return Pipeline([
+        ("features", FeatureEngineer()),
+        ("preprocess", preprocess),
+        ("model", model)
+    ])
+
+
+# SVM pipeline
+def build_svm_pipeline(model=None, numeric_cols=None, categorical_cols=None):
+    if model is None:
+        model = SVC(
+            kernel="rbf",
+            C=1.0,
+            gamma="scale",
+            probability=True
+        )
+
+    preprocess = ColumnTransformer([
+        ("num", StandardScaler(), numeric_cols),
+        ("cat", OneHotEncoder(handle_unknown="ignore", min_frequency=0.02), categorical_cols)
+    ])
+
+    return Pipeline(steps=[
+        ("features", FeatureEngineer()),
+        ("preprocess", preprocess),
+        ("model", model)
+    ])
+
+
+
+def build_linear_svm_pipeline(model=None, numeric_cols=None, categorical_cols=None):
+    if model is None:
+        model = LinearSVC(
+            C=1.0,
+            max_iter=5000,
+            dual=False  # usually better when n_samples > n_features
+        )
+
+    preprocess = ColumnTransformer([
+        ("num", StandardScaler(), numeric_cols),
+        ("cat", OneHotEncoder(handle_unknown="ignore", min_frequency=0.02), categorical_cols)
+    ])
+
+    return Pipeline(steps=[
         ("features", FeatureEngineer()),
         ("preprocess", preprocess),
         ("model", model)
